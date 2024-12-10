@@ -1,0 +1,12 @@
+[package]
+name = "solana-token-program"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+solana-program = "1.18.8"
+
+[dev-dependencies]
+solana-program-test = "1.18.26"
+solana-sdk = "1.18.26"
+tokio = "1.42.0"
