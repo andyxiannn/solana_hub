@@ -7,9 +7,10 @@ import dotenv from "dotenv"
 dotenv.config()
 // createSolanaWallet()
 // getSolanaWallet()
-getBalance()
+// getBalance()
 // getWalletInfo()
 // sendNativeToken()
+getWalletTransactions()
 
 async function sendNativeToken(){
     try {
@@ -95,4 +96,11 @@ async function createSolanaWallet(){
     console.log("Restored Public Key:", restoredKeypair.publicKey.toString());
     console.log("Restored Secret Key:", restoredKeypair.secretKey.toString());
 
+}
+
+async function getWalletTransactions(){
+    const pubkey = "HdwHSr9ffLZrZkrm4QqTffcotDvVnTsp5JJgy6w68yKk"
+    const devnetRPC = web3.clusterApiUrl('devnet');
+    const txnList = await svmUtils.getTransactionHistory(pubkey, devnetRPC, {limit: 10})
+    console.log(txnList)
 }

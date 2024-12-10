@@ -97,10 +97,76 @@ async function sendSolTransaction(fromKeypair, toPublicKey, amountInSol, rpcEndp
     }
 }
 
+async function getTransactionHistory(walletAddress, rpcEndpoint, options ={}){
+    try {
+        // Establish connection to Solana network
+        const connection = new web3.Connection(rpcEndpoint || web3.clusterApiUrl('devnet'), 'confirmed' );
+        const publicKey = new web3.PublicKey(walletAddress);
+        const limit = options.limit || 20;
+  
+        // Fetch transaction signatures
+        const signatures = await connection.getSignaturesForAddress(
+          publicKey, 
+          { 
+            limit: limit,
+            before: options.before
+          }
+        );
+  
+        // Fetch and process transaction details
+      const transactions = await Promise.all(
+        signatures.map(async (sig) => {
+            try {
+                const tx = await connection.getParsedTransaction(sig.signature);
+                console.log(sig)
+                // Basic transaction details
+                const transactionDetail = {
+                    signature: sig.signature,
+                    blockTime: sig.blockTime ? new Date(sig.blockTime * 1000) : null,
+                    status: sig.confirmationStatus=="finalized"? 'Success' : 'Failed',
+                    fee: tx?.meta?.fee,
+                    type: 'unknown'
+                };
+
+                // Extract SOL transfer details
+                const instructions = tx?.transaction?.message?.instructions || [];
+                const transferInstruction = instructions.find(
+                    (inst) => inst.program === 'system' && inst.parsed?.type === 'transfer'
+                );
+
+                if (transferInstruction) {
+                const parsed = transferInstruction.parsed;
+                transactionDetail.amount = parsed?.info?.lamports / 1_000_000_000; // Convert to SOL
+                transactionDetail.fromAddress = parsed?.info?.source;
+                transactionDetail.toAddress = parsed?.info?.destination;
+                
+                // Determine transaction type
+                transactionDetail.type = parsed?.info?.source === publicKey.toBase58() 
+                    ? 'send' 
+                    : 'receive';
+                }
+
+                return transactionDetail;
+            } catch (txError) {
+                console.error(`Error processing transaction ${sig.signature}:`, txError);
+                return null;
+            }
+        })
+      );
+
+      // Filter out null results
+      return transactions.filter((tx) => tx !== null);
+    } catch (error) {
+    console.error('Error fetching wallet transactions:', error);
+    throw error;
+    }
+}
+
 export default { 
     createWallet,
     getKeypairFromSeedPhrase,
     checkBalance,
     getWalletAccountInfo,
-    sendSolTransaction
+    sendSolTransaction,
+    getTransactionHistory
 }
