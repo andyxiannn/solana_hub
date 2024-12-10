@@ -123,8 +123,8 @@ async function getTransactionHistory(walletAddress, rpcEndpoint, options ={}){
                 const transactionDetail = {
                     signature: sig.signature,
                     blockTime: sig.blockTime ? new Date(sig.blockTime * 1000) : null,
-                    status: sig.confirmationStatus=="finalized"? 'Success' : 'Failed',
-                    fee: tx?.meta?.fee,
+                    status: sig.confirmationStatus == "finalized"? 'Success' : 'Failed',
+                    fee: tx?.meta?.fee / 1_000_000_000, // Convert to SOL,
                     type: 'unknown'
                 };
 
