@@ -20,10 +20,13 @@ node walletService.js
 ## Install Dependencies
 ```
 https://solana.com/docs/intro/installation
+cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+
 ```
 
 ## Build token program 
 ```
-cargo b
-cargo build-spf
+https://www.quicknode.com/guides/solana-development/tooling/web3-2/program-clients
+cargo build-bpf
+
 ```

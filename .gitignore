@@ -6,3 +6,4 @@ package-lock.json
 /assets
 /key
 /solana-token-program/target
+/solana-counter-program/target
