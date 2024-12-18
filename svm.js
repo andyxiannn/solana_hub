@@ -32,6 +32,9 @@ async function getKeypairFromSeedPhrase(seedPhrase){
     }
 }
 
+/**
+ * @param {web3.PublicKeyInitData} pubKey
+ */
 async function checkBalance(pubKey) {
     try {
         // Replace with your wallet's public key
@@ -54,6 +57,9 @@ async function checkBalance(pubKey) {
     }
 }
 
+/**
+ * @param {web3.PublicKeyInitData} publicKey
+ */
 async function getWalletAccountInfo(publicKey) {
     try {
         const customRPC = 'https://api.devnet.solana.com'; // or your preferred RPC
@@ -68,6 +74,12 @@ async function getWalletAccountInfo(publicKey) {
     }
 }
 
+/**
+ * @param {any} fromKeypair
+ * @param {any} toPublicKey
+ * @param {number} amountInSol
+ * @param {any} rpcEndpoint
+ */
 async function sendSolTransaction(fromKeypair, toPublicKey, amountInSol, rpcEndpoint ){
     try {
         // Establish connection to Solana network
@@ -97,6 +109,10 @@ async function sendSolTransaction(fromKeypair, toPublicKey, amountInSol, rpcEndp
     }
 }
 
+/**
+ * @param {web3.PublicKeyInitData} walletAddress
+ * @param {any} rpcEndpoint
+ */
 async function getTransactionHistory(walletAddress, rpcEndpoint, options ={}){
     try {
         // Establish connection to Solana network
