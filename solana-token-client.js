@@ -43,26 +43,31 @@ export class TokenProgramClient {
    */
   async createMint( decimals = 9, mintAuthority ) {
     // Generate a new mint keypair
-    const mint = web3.Keypair.generate();
-    
+    const metadata = {
+      name: 'Solana TEST',
+      symbol: 'TESTSOL',
+      uri: 'https://raw.githubusercontent.com/solana-developers/program-examples/new-examples/tokens/tokens/.assets/spl-token.json',
+    };
+  
     // Use wallet's pubkey as default mint authority
-    const authority = mintAuthority || this.wallet.publicKey;
+    const mintKeypair = web3.Keypair.generate();
 
     // Create mint transaction
-    
-    const tx = await this.program.methods
-      .initializeMint(decimals, authority)
-      .accounts({
-        mint: mint.publicKey,
-        mintAuthority: authority,
-        systemProgram: web3.SystemProgram.programId,
-        tokenProgram: splToken.TOKEN_PROGRAM_ID,
-        rent: web3.SYSVAR_RENT_PUBKEY,
-      })
-      .signers([mint])
-      .rpc();
+    console.log(mintAuthority)
+    const transactionSignature = await this.program.methods
+    .createTokenMint(9, metadata.name, metadata.symbol, metadata.uri)
+    .accounts({
+      payer: mintAuthority.publicKey,
+      mintAccount: mintKeypair.publicKey,
+    })
+    .signers([mintKeypair])
+    .rpc();
 
-    return mint.publicKey;
+    console.log('Success!');
+    console.log(`   Mint Address: ${mintKeypair.publicKey}`);
+    console.log(`   Transaction Signature: ${transactionSignature}`);
+
+    return mintKeypair.publicKey;
   }
 
   // Create an associated token account
@@ -172,26 +177,26 @@ async function main() {
 
   try {
     // Create a new mint
-    const mint = await tokenClient.createMint(9);
+    const mintAccount = await tokenClient.createMint(9, wallet);
 
     // Create a token account for the wallet
-    const tokenAccount = await tokenClient.createTokenAccount(
-      mint, 
-      wallet.publicKey
-    );
+    // const tokenAccount = await tokenClient.createTokenAccount(
+    //   mint, 
+    //   wallet.publicKey
+    // );
 
-    // Mint 1000 tokens
-    const mintTx = await tokenClient.mintTokens(
-      mint, 
-      tokenAccount, 
-      1000 * 10 ** 9 // 1000 tokens with 9 decimals
-    );
+    // // Mint 1000 tokens
+    // const mintTx = await tokenClient.mintTokens(
+    //   mint, 
+    //   tokenAccount, 
+    //   1000 * 10 ** 9 // 1000 tokens with 9 decimals
+    // );
 
-    console.log('Mint Transaction:', mintTx);
+    // console.log('Mint Transaction:', mintTx);
 
     // Check balance
-    const balance = await tokenClient.getTokenBalance(tokenAccount);
-    console.log('Token Balance:', balance.toString());
+    // const balance = await tokenClient.getTokenBalance(tokenAccount);
+    // console.log('Token Balance:', balance.toString());
   } catch (error) {
     console.error('Error in token program:', error);
   }
